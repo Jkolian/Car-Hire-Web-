@@ -167,139 +167,721 @@ function VehicleRow({ v, onSelect }) {
   );
 }
 
-function BookingPanel({ vehicle, pickup, ret, onBack, onConfirmed }) {
-  const [form, setForm] = useState({
-    name: "", phone: "",
-    pickup: pickup || todayISO(),
-    ret: ret || addDaysISO(todayISO(), 2),
-    notes: "",
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-  const days = dayCount(form.pickup, form.ret);
-  const total = days * vehicle.price;
-  const canSubmit = form.name.trim().length > 1 && form.phone.trim().length >= 9 && !submitting;
+function BookingPanel({ vehicle, onBack }) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [pickup, setPickup] = useState("");
+  const [ret, setRet] = useState("");
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(null);
 
-  const submit = async () => {
-    setSubmitting(true);
-    setError(null);
-    try {
-      const booking = await apiPost("/bookings", {
-        vehicleId: vehicle.id,
-        name: form.name,
-        phone: form.phone,
-        pickup: form.pickup,
-        ret: form.ret,
-        notes: form.notes,
-      });
-      onConfirmed(booking);
-    } catch (e) {
-      setError(e.message || "Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
+  const days = pickup && ret ? dayCount(pickup, ret) : 0;
+  const total = days * Number(vehicle.price || 0);
+
+  async function submitBooking(e) {
+    e.preventDefault();
+    setError("");
+    setSuccess(null);
+
+    if (!name || !phone || !pickup || !ret) {
+      setError("Please fill in all required fields.");
+      return;
     }
-  };
+
+    if (new Date(ret) <= new Date(pickup)) {
+      setError("Return date must be after the pickup date.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        `${API_BASE}/api/bookings`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            vehicleId: vehicle.id,
+            name,
+            phone,
+            pickup,
+            ret,
+            notes,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create booking");
+      }
+
+      setSuccess(data);
+
+      setName("");
+      setPhone("");
+      setPickup("");
+      setRet("");
+      setNotes("");
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to create booking");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <div>
-      <button onClick={onBack} className="flex items-center gap-2 text-sm font-semibold mb-6" style={{ color: INK, opacity: 0.7 }}>
-        <ArrowLeft size={16} /> Back to vehicles
+    <section className="max-w-5xl mx-auto px-4 py-8">
+      {/* Back button */}
+      <button
+        type="button"
+        onClick={onBack}
+        className="flex items-center gap-2 mb-6 text-sm font-semibold"
+        style={{ color: RED }}
+      >
+        <ArrowLeft size={16} />
+        Back to vehicles
       </button>
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="md:w-2/5">
-          <div className="flex items-center justify-center mb-4" style={{ height: 160, backgroundColor: TYPE_COLOR[vehicle.type], borderRadius: 4 }}>
-            <Car size={56} color={CARD} strokeWidth={1.3} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* =====================================================
+            LEFT: VEHICLE DETAILS
+        ====================================================== */}
+        <div>
+          {/* Vehicle image */}
+          <div
+            className="relative overflow-hidden mb-5"
+            style={{
+              height: 320,
+              backgroundColor: TYPE_COLOR[vehicle.type],
+              borderRadius: 8,
+            }}
+          >
+            {vehicle.image_url ? (
+              <img
+                src={vehicle.image_url}
+                alt={vehicle.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+
+                  const fallback =
+                    e.currentTarget.nextElementSibling;
+
+                  if (fallback) {
+                    fallback.style.display = "flex";
+                  }
+                }}
+              />
+            ) : null}
+
+            {/* Image fallback */}
+            <div
+              className="w-full h-full items-center justify-center"
+              style={{
+                display: vehicle.image_url ? "none" : "flex",
+              }}
+            >
+              <Car
+                size={72}
+                color={CARD}
+                strokeWidth={1.3}
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-2 flex-wrap mb-2">
-            <h2 className="font-serif text-2xl" style={{ color: INK }}>{vehicle.name}</h2>
-            <TypeTag type={vehicle.type} />
+
+          {/* Vehicle name */}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <TypeTag type={vehicle.type} />
+
+              <h1
+                className="font-serif text-3xl mt-2"
+                style={{ color: INK }}
+              >
+                {vehicle.name}
+              </h1>
+
+              <p
+                className="mt-2 text-sm"
+                style={{ color: INK, opacity: 0.65 }}
+              >
+                {vehicle.location}
+              </p>
+            </div>
+
+            <div className="text-right shrink-0">
+              <div
+                className="font-serif text-2xl"
+                style={{ color: GOLD }}
+              >
+                KES {Number(vehicle.price).toLocaleString()}
+              </div>
+
+              <div
+                className="text-sm"
+                style={{ color: INK, opacity: 0.55 }}
+              >
+                per day
+              </div>
+            </div>
           </div>
-          <p className="text-sm mb-4" style={{ color: INK, opacity: 0.75, lineHeight: 1.6 }}>{vehicle.blurb}</p>
-          <div className="grid grid-cols-2 gap-3 text-sm" style={{ color: INK, opacity: 0.8 }}>
-            <div className="flex items-center gap-2"><Users size={15} /> {vehicle.seats} seats</div>
-            <div className="flex items-center gap-2"><Gauge size={15} /> {vehicle.transmission}</div>
-            <div className="flex items-center gap-2"><Fuel size={15} /> {vehicle.fuel}</div>
-            <div className="flex items-center gap-2"><MapPin size={15} /> {vehicle.location}</div>
+
+          {/* Description */}
+          {vehicle.blurb && (
+            <p
+              className="mt-5 leading-7"
+              style={{ color: INK, opacity: 0.78 }}
+            >
+              {vehicle.blurb}
+            </p>
+          )}
+
+          {/* =====================================================
+              VEHICLE SPECIFICATIONS
+          ====================================================== */}
+          <div
+            className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6"
+          >
+            <div
+              className="p-3"
+              style={{
+                backgroundColor: "#F7F3EA",
+                borderRadius: 6,
+              }}
+            >
+              <div
+                className="text-xs uppercase tracking-wide"
+                style={{ color: INK, opacity: 0.5 }}
+              >
+                Seats
+              </div>
+
+              <div
+                className="font-semibold mt-1"
+                style={{ color: INK }}
+              >
+                {vehicle.seats || "—"}
+              </div>
+            </div>
+
+            <div
+              className="p-3"
+              style={{
+                backgroundColor: "#F7F3EA",
+                borderRadius: 6,
+              }}
+            >
+              <div
+                className="text-xs uppercase tracking-wide"
+                style={{ color: INK, opacity: 0.5 }}
+              >
+                Transmission
+              </div>
+
+              <div
+                className="font-semibold mt-1"
+                style={{ color: INK }}
+              >
+                {vehicle.transmission || "—"}
+              </div>
+            </div>
+
+            <div
+              className="p-3"
+              style={{
+                backgroundColor: "#F7F3EA",
+                borderRadius: 6,
+              }}
+            >
+              <div
+                className="text-xs uppercase tracking-wide"
+                style={{ color: INK, opacity: 0.5 }}
+              >
+                Fuel
+              </div>
+
+              <div
+                className="font-semibold mt-1"
+                style={{ color: INK }}
+              >
+                {vehicle.fuel || "—"}
+              </div>
+            </div>
+
+            <div
+              className="p-3"
+              style={{
+                backgroundColor: "#F7F3EA",
+                borderRadius: 6,
+              }}
+            >
+              <div
+                className="text-xs uppercase tracking-wide"
+                style={{ color: INK, opacity: 0.5 }}
+              >
+                Year
+              </div>
+
+              <div
+                className="font-semibold mt-1"
+                style={{ color: INK }}
+              >
+                {vehicle.year || "—"}
+              </div>
+            </div>
+
+            <div
+              className="p-3"
+              style={{
+                backgroundColor: "#F7F3EA",
+                borderRadius: 6,
+              }}
+            >
+              <div
+                className="text-xs uppercase tracking-wide"
+                style={{ color: INK, opacity: 0.5 }}
+              >
+                Drive
+              </div>
+
+              <div
+                className="font-semibold mt-1"
+                style={{ color: INK }}
+              >
+                {vehicle.drive || "—"}
+              </div>
+            </div>
+
+            <div
+              className="p-3"
+              style={{
+                backgroundColor: "#F7F3EA",
+                borderRadius: 6,
+              }}
+            >
+              <div
+                className="text-xs uppercase tracking-wide"
+                style={{ color: INK, opacity: 0.5 }}
+              >
+                Mileage
+              </div>
+
+              <div
+                className="font-semibold mt-1"
+                style={{ color: INK }}
+              >
+                {vehicle.mileage_km
+                  ? `${Number(vehicle.mileage_km).toLocaleString()} km`
+                  : "—"}
+              </div>
+            </div>
           </div>
-          <div className="mt-4 pt-4 text-sm" style={{ borderTop: `1px solid ${LINE}`, color: INK, opacity: 0.65 }}>
-            Owner: {vehicle.owner} &middot; {vehicle.phone}
+
+          {/* Engine */}
+          {vehicle.engine && (
+            <div className="mt-5">
+              <div
+                className="text-xs uppercase tracking-wide"
+                style={{ color: INK, opacity: 0.5 }}
+              >
+                Engine
+              </div>
+
+              <div
+                className="mt-1 font-medium"
+                style={{ color: INK }}
+              >
+                {vehicle.engine}
+              </div>
+            </div>
+          )}
+
+          {/* Features */}
+          {Array.isArray(vehicle.features) &&
+            vehicle.features.length > 0 && (
+              <div className="mt-6">
+                <div
+                  className="text-xs uppercase tracking-wide mb-3"
+                  style={{ color: INK, opacity: 0.5 }}
+                >
+                  Features
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {vehicle.features.map((feature, index) => (
+                    <div
+                      key={`${feature}-${index}`}
+                      className="flex items-center gap-2 text-sm"
+                      style={{ color: INK }}
+                    >
+                      <Check
+                        size={15}
+                        style={{ color: RED }}
+                      />
+
+                      <span>{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          {/* Availability */}
+          <div
+            className="mt-6 inline-flex items-center gap-2 px-3 py-2 text-sm"
+            style={{
+              backgroundColor: vehicle.available
+                ? "#EEF7EE"
+                : "#FBECEC",
+              color: vehicle.available
+                ? "#356B35"
+                : "#9B3B3B",
+              borderRadius: 5,
+            }}
+          >
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{
+                backgroundColor: vehicle.available
+                  ? "#4C8A4C"
+                  : "#B84A4A",
+              }}
+            />
+
+            {vehicle.available
+              ? "Available for booking"
+              : "Currently unavailable"}
           </div>
         </div>
 
-        <div className="md:w-3/5">
-          <div className="p-5" style={{ backgroundColor: CARD, border: `1px solid ${LINE}`, borderRadius: 4 }}>
-            <h3 className="font-serif text-lg mb-4" style={{ color: INK }}>Book this vehicle</h3>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <label className="text-sm">
-                <span className="block mb-1 font-medium" style={{ color: INK }}>Pickup date</span>
-                <input type="date" value={form.pickup} min={todayISO()}
-                  onChange={(e) => setForm({ ...form, pickup: e.target.value })}
-                  className="w-full px-3 py-2 text-sm" style={{ border: `1px solid ${LINE}`, borderRadius: 3, backgroundColor: "white" }} />
-              </label>
-              <label className="text-sm">
-                <span className="block mb-1 font-medium" style={{ color: INK }}>Return date</span>
-                <input type="date" value={form.ret} min={form.pickup}
-                  onChange={(e) => setForm({ ...form, ret: e.target.value })}
-                  className="w-full px-3 py-2 text-sm" style={{ border: `1px solid ${LINE}`, borderRadius: 3, backgroundColor: "white" }} />
-              </label>
-            </div>
-            <label className="text-sm block mb-4">
-              <span className="block mb-1 font-medium" style={{ color: INK }}>Your name</span>
-              <div className="flex items-center gap-2 px-3 py-2" style={{ border: `1px solid ${LINE}`, borderRadius: 3, backgroundColor: "white" }}>
-                <User size={15} style={{ opacity: 0.5 }} />
-                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="e.g. Wanjiku Otieno" className="w-full text-sm outline-none" style={{ backgroundColor: "transparent" }} />
-              </div>
-            </label>
-            <label className="text-sm block mb-4">
-              <span className="block mb-1 font-medium" style={{ color: INK }}>Phone number</span>
-              <div className="flex items-center gap-2 px-3 py-2" style={{ border: `1px solid ${LINE}`, borderRadius: 3, backgroundColor: "white" }}>
-                <Phone size={15} style={{ opacity: 0.5 }} />
-                <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="07xx xxx xxx" className="w-full text-sm outline-none" style={{ backgroundColor: "transparent" }} />
-              </div>
-            </label>
-            <label className="text-sm block mb-5">
-              <span className="block mb-1 font-medium" style={{ color: INK }}>Notes for the owner (optional)</span>
-              <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                placeholder="e.g. Need pickup at the bus stage, or a driver included"
-                rows={2} className="w-full px-3 py-2 text-sm outline-none" style={{ border: `1px solid ${LINE}`, borderRadius: 3, backgroundColor: "white" }} />
-            </label>
+        {/* =====================================================
+            RIGHT: BOOKING FORM
+        ====================================================== */}
+        <div>
+          <div
+            className="p-6 sm:p-7"
+            style={{
+              border: `1px solid ${LINE}`,
+              backgroundColor: CARD,
+              borderRadius: 8,
+            }}
+          >
+            <h2
+              className="font-serif text-2xl"
+              style={{ color: INK }}
+            >
+              Book this vehicle
+            </h2>
 
-            <div className="flex items-center justify-between mb-5 pt-4" style={{ borderTop: `1px solid ${LINE}` }}>
-              <span className="text-sm" style={{ color: INK, opacity: 0.7 }}>{days} day{days > 1 ? "s" : ""} &times; KES {vehicle.price.toLocaleString()}</span>
-              <span className="font-serif text-xl" style={{ color: GOLD }}>KES {total.toLocaleString()}</span>
-            </div>
+            <p
+              className="text-sm mt-1 mb-6"
+              style={{ color: INK, opacity: 0.6 }}
+            >
+              Send a booking request and the owner will confirm
+              availability.
+            </p>
 
             {error && (
-              <p className="text-sm mb-4" style={{ color: RED }}>{error}</p>
+              <div
+                className="mb-5 p-3 text-sm"
+                style={{
+                  backgroundColor: "#FBECEC",
+                  color: "#9B3B3B",
+                  borderRadius: 5,
+                }}
+              >
+                {error}
+              </div>
             )}
 
-            <button
-              disabled={!canSubmit}
-              onClick={submit}
-              className="w-full py-3 font-semibold text-sm flex items-center justify-center gap-2"
-              style={{
-                backgroundColor: canSubmit ? RED : LINE,
-                color: canSubmit ? CARD : INK,
-                opacity: canSubmit ? 1 : 0.5,
-                borderRadius: 3,
-                cursor: canSubmit ? "pointer" : "not-allowed",
-              }}
-            >
-              {submitting && <Loader2 size={16} className="animate-spin" />}
-              {submitting ? "Sending request..." : "Request booking"}
-            </button>
-            <p className="text-xs mt-3" style={{ color: INK, opacity: 0.5 }}>
-              This sends a request to the owner — payment and final confirmation happen directly with them.
-            </p>
+            {success && (
+              <div
+                className="mb-5 p-4"
+                style={{
+                  backgroundColor: "#EEF7EE",
+                  color: "#356B35",
+                  borderRadius: 5,
+                }}
+              >
+                <div className="font-semibold">
+                  Booking request received
+                </div>
+
+                {success.ref && (
+                  <div className="text-sm mt-1">
+                    Reference:{" "}
+                    <strong>{success.ref}</strong>
+                  </div>
+                )}
+
+                <div className="text-sm mt-2">
+                  The vehicle owner can now confirm your request.
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={submitBooking}>
+              {/* Name */}
+              <div className="mb-4">
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: INK }}
+                >
+                  Full name *
+                </label>
+
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your full name"
+                  className="w-full px-3 py-3 outline-none"
+                  style={{
+                    border: `1px solid ${LINE}`,
+                    borderRadius: 5,
+                    color: INK,
+                    backgroundColor: CARD,
+                  }}
+                  required
+                />
+              </div>
+
+              {/* Phone */}
+              <div className="mb-4">
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: INK }}
+                >
+                  Phone number *
+                </label>
+
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="07XX XXX XXX"
+                  className="w-full px-3 py-3 outline-none"
+                  style={{
+                    border: `1px solid ${LINE}`,
+                    borderRadius: 5,
+                    color: INK,
+                    backgroundColor: CARD,
+                  }}
+                  required
+                />
+              </div>
+
+              {/* Dates */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: INK }}
+                  >
+                    Pickup date *
+                  </label>
+
+                  <input
+                    type="date"
+                    value={pickup}
+                    min={new Date().toISOString().slice(0, 10)}
+                    onChange={(e) => setPickup(e.target.value)}
+                    className="w-full px-3 py-3 outline-none"
+                    style={{
+                      border: `1px solid ${LINE}`,
+                      borderRadius: 5,
+                      color: INK,
+                      backgroundColor: CARD,
+                    }}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: INK }}
+                  >
+                    Return date *
+                  </label>
+
+                  <input
+                    type="date"
+                    value={ret}
+                    min={
+                      pickup ||
+                      new Date().toISOString().slice(0, 10)
+                    }
+                    onChange={(e) => setRet(e.target.value)}
+                    className="w-full px-3 py-3 outline-none"
+                    style={{
+                      border: `1px solid ${LINE}`,
+                      borderRadius: 5,
+                      color: INK,
+                      backgroundColor: CARD,
+                    }}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div className="mb-5">
+                <label
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: INK }}
+                >
+                  Notes
+                </label>
+
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Pickup details, destination, special requests..."
+                  rows={4}
+                  className="w-full px-3 py-3 outline-none resize-none"
+                  style={{
+                    border: `1px solid ${LINE}`,
+                    borderRadius: 5,
+                    color: INK,
+                    backgroundColor: CARD,
+                  }}
+                />
+              </div>
+
+              {/* Booking summary */}
+              <div
+                className="p-4 mb-5"
+                style={{
+                  backgroundColor: "#F7F3EA",
+                  borderRadius: 6,
+                }}
+              >
+                <div className="flex justify-between text-sm">
+                  <span style={{ color: INK, opacity: 0.65 }}>
+                    Daily rate
+                  </span>
+
+                  <span
+                    className="font-semibold"
+                    style={{ color: INK }}
+                  >
+                    KES {Number(vehicle.price).toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex justify-between text-sm mt-2">
+                  <span style={{ color: INK, opacity: 0.65 }}>
+                    Number of days
+                  </span>
+
+                  <span
+                    className="font-semibold"
+                    style={{ color: INK }}
+                  >
+                    {days || "—"}
+                  </span>
+                </div>
+
+                <div
+                  className="flex justify-between mt-4 pt-4"
+                  style={{
+                    borderTop: `1px solid ${LINE}`,
+                  }}
+                >
+                  <span
+                    className="font-serif text-lg"
+                    style={{ color: INK }}
+                  >
+                    Estimated total
+                  </span>
+
+                  <span
+                    className="font-serif text-xl"
+                    style={{ color: GOLD }}
+                  >
+                    {days
+                      ? `KES ${total.toLocaleString()}`
+                      : "—"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading || vehicle.available === false}
+                className="w-full py-3.5 font-semibold"
+                style={{
+                  backgroundColor:
+                    loading || vehicle.available === false
+                      ? "#B8B1A5"
+                      : RED,
+                  color: "#FFFFFF",
+                  borderRadius: 5,
+                  cursor:
+                    loading || vehicle.available === false
+                      ? "not-allowed"
+                      : "pointer",
+                }}
+              >
+                {loading
+                  ? "Sending request..."
+                  : vehicle.available === false
+                  ? "Vehicle unavailable"
+                  : "Request booking"}
+              </button>
+            </form>
+
+            {/* Owner contact */}
+            {(vehicle.owner || vehicle.phone) && (
+              <div
+                className="mt-6 pt-5"
+                style={{
+                  borderTop: `1px solid ${LINE}`,
+                }}
+              >
+                <div
+                  className="text-xs uppercase tracking-wide"
+                  style={{ color: INK, opacity: 0.5 }}
+                >
+                  Vehicle owner
+                </div>
+
+                {vehicle.owner && (
+                  <div
+                    className="font-medium mt-1"
+                    style={{ color: INK }}
+                  >
+                    {vehicle.owner}
+                  </div>
+                )}
+
+                {vehicle.phone && (
+                  <a
+                    href={`tel:${vehicle.phone}`}
+                    className="text-sm"
+                    style={{ color: RED }}
+                  >
+                    {vehicle.phone}
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
-
 function Confirmation({ booking, onDone }) {
   const depositAmount = Math.max(500, Math.round(booking.total * 0.2));
   const [payPhone, setPayPhone] = useState(booking.phone || "");
