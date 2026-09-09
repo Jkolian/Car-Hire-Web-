@@ -70,32 +70,98 @@ function TypeTag({ type, size = "sm" }) {
 
 function VehicleRow({ v, onSelect }) {
   const color = TYPE_COLOR[v.type];
+
   return (
     <button
       onClick={() => onSelect(v)}
       className="w-full text-left flex flex-col sm:flex-row gap-4 sm:items-center py-5"
       style={{ borderBottom: `1px solid ${LINE}` }}
     >
-      <div className="flex items-center justify-center shrink-0" style={{ width: 84, height: 64, backgroundColor: color, borderRadius: 4 }}>
-        <Car size={30} color={CARD} strokeWidth={1.5} />
+      {/* Vehicle image */}
+      <div
+        className="flex items-center justify-center shrink-0 overflow-hidden"
+        style={{
+          width: 140,
+          height: 90,
+          backgroundColor: color,
+          borderRadius: 6,
+        }}
+      >
+        {v.image_url ? (
+          <img
+            src={v.image_url}
+            alt={v.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              e.currentTarget.nextElementSibling.style.display = "flex";
+            }}
+          />
+        ) : null}
+
+        {/* Fallback icon */}
+        <div
+          className="items-center justify-center w-full h-full"
+          style={{
+            display: v.image_url ? "none" : "flex",
+          }}
+        >
+          <Car size={34} color={CARD} strokeWidth={1.5} />
+        </div>
       </div>
+
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="font-serif text-lg" style={{ color: INK }}>{v.name}</h3>
+          <h3 className="font-serif text-lg" style={{ color: INK }}>
+            {v.name}
+          </h3>
+
           <TypeTag type={v.type} />
         </div>
-        <div className="flex items-center gap-4 mt-1 text-sm" style={{ color: INK, opacity: 0.65 }}>
-          <span className="flex items-center gap-1"><Users size={14} /> {v.seats} seats</span>
-          <span className="flex items-center gap-1"><Gauge size={14} /> {v.transmission}</span>
-          <span className="flex items-center gap-1"><MapPin size={14} /> {v.location}</span>
+
+        <div
+          className="flex items-center gap-4 mt-1 text-sm flex-wrap"
+          style={{ color: INK, opacity: 0.65 }}
+        >
+          <span className="flex items-center gap-1">
+            <Users size={14} /> {v.seats} seats
+          </span>
+
+          <span className="flex items-center gap-1">
+            <Gauge size={14} /> {v.transmission}
+          </span>
+
+          <span className="flex items-center gap-1">
+            <MapPin size={14} /> {v.location}
+          </span>
         </div>
       </div>
+
       <div className="text-right shrink-0 flex sm:flex-col items-center sm:items-end justify-between gap-1">
         <div>
-          <span className="font-serif text-xl" style={{ color: GOLD }}>KES {v.price.toLocaleString()}</span>
-          <span className="text-sm" style={{ color: INK, opacity: 0.55 }}> /day</span>
+          <span
+            className="font-serif text-xl"
+            style={{ color: GOLD }}
+          >
+            KES {v.price.toLocaleString()}
+          </span>
+
+          <span
+            className="text-sm"
+            style={{ color: INK, opacity: 0.55 }}
+          >
+            {" "}
+            /day
+          </span>
         </div>
-        <span className="text-sm font-semibold" style={{ color: RED }}>View details</span>
+
+        <span
+          className="text-sm font-semibold"
+          style={{ color: RED }}
+        >
+          View details
+        </span>
       </div>
     </button>
   );
