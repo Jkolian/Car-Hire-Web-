@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Car, MapPin, Calendar, Phone, User, CheckCircle2, ArrowLeft,
-  Users, Fuel, Gauge, Loader2
+  Users, Fuel, Gauge, Loader2, check
 } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
