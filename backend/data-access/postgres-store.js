@@ -28,21 +28,30 @@ function vehicleRowToObject(row) {
   };
 }
 
-function bookingRowToObject(row) {
+function vehicleRowToObject(row) {
   return {
-    ref: row.ref,
-    vehicleId: row.vehicle_id,
-    vehicleName: row.vehicle_name,
-    name: row.customer_name,
-    phone: row.customer_phone,
-    pickup: row.pickup_date.toISOString().slice(0, 10),
-    ret: row.return_date.toISOString().slice(0, 10),
-    notes: row.notes,
-    days: row.days,
-    total: row.total,
-    status: row.status,
-    mpesaCheckoutId: row.mpesa_checkout_id,
-    mpesaReceiptNumber: row.mpesa_receipt_number,
+    id: row.id,
+    name: row.name,
+    type: row.type,
+    seats: row.seats,
+    transmission: row.transmission,
+    fuel: row.fuel,
+    price: row.price,
+    location: row.location,
+    owner: row.owner_name,
+    phone: row.owner_phone,
+    blurb: row.blurb,
+
+    // Vehicle details
+    year: row.year,
+    engine: row.engine,
+    drive: row.drive,
+    mileage_km: row.mileage_km,
+    features: row.features,
+    available: row.available,
+
+    // Vehicle image
+    image_url: row.image_url,
   };
 }
 
