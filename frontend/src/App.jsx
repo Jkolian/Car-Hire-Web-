@@ -12,9 +12,6 @@ import {
   Gauge,
   Loader2,
   Check,
-  Facebook,
-  Instagram,
-  Linkedin,
   MessageCircle,
   Mail,
   Clock3
