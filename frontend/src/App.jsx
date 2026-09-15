@@ -8,13 +8,13 @@ const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
 
 // ---- Design tokens ----
 const INK = "#201D18";
-const SAND = "#EDE6D2";
+const SAND = "#FFFFF";
 const CARD = "#FBF8F1";
 const RED = "#A8382B";
 const OLIVE = "#556047";
 const GOLD = "#C0923A";
 const TEAL = "#3D6763";
-const LINE = "rgba(32,29,24,0.14)";
+const LINE = "rgba(32,29,24,0.12)";
 
 const TYPE_COLOR = {
   "Safari 4x4": RED,
@@ -471,35 +471,54 @@ export default function App() {
 
         {tab === "book" && view === "browse" && (
           <>
-            <h1 className="font-serif text-3xl mb-2" style={{ color: INK, lineHeight: 1.15 }}>
-              Get a vehicle in Narok, today or for the Mara.
-            </h1>
-            <p className="text-sm mb-6" style={{ color: INK, opacity: 0.65 }}>
-              Local sedans for town errands, or a full safari 4x4 for the migration — booked directly with the owner.
-            </p>
+                       <section className="text-center mb-10 pt-4">
+              <h1 className="font-serif text-4xl mb-3" style={{ color: INK, lineHeight: 1.15 }}>
+                Car hire in Narok, done simply.
+              </h1>
+              <p className="text-base mb-8 mx-auto" style={{ color: INK, opacity: 0.65, maxWidth: 480 }}>
+                Pick your dates, choose a vehicle, and book directly with the owner — no call centre, no middleman.
+              </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 mb-6 p-4" style={{ backgroundColor: CARD, border: `1px solid ${LINE}`, borderRadius: 4 }}>
-              <label className="text-sm flex-1">
-                <span className="block mb-1 font-medium" style={{ color: INK }}>Pickup</span>
-                <div className="flex items-center gap-2 px-3 py-2" style={{ border: `1px solid ${LINE}`, borderRadius: 3, backgroundColor: "white" }}>
-                  <Calendar size={14} style={{ opacity: 0.5 }} />
-                  <input type="date" value={search.pickup} min={todayISO()}
-                    onChange={(e) => setSearch({ ...search, pickup: e.target.value })}
-                    className="w-full text-sm outline-none" style={{ backgroundColor: "transparent" }} />
-                </div>
-              </label>
-              <label className="text-sm flex-1">
-                <span className="block mb-1 font-medium" style={{ color: INK }}>Return</span>
-                <div className="flex items-center gap-2 px-3 py-2" style={{ border: `1px solid ${LINE}`, borderRadius: 3, backgroundColor: "white" }}>
-                  <Calendar size={14} style={{ opacity: 0.5 }} />
-                  <input type="date" value={search.ret} min={search.pickup}
-                    onChange={(e) => setSearch({ ...search, ret: e.target.value })}
-                    className="w-full text-sm outline-none" style={{ backgroundColor: "transparent" }} />
-                </div>
-              </label>
-            </div>
+              <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto p-3" style={{ backgroundColor: CARD, border: `1px solid ${LINE}`, borderRadius: 6 }}>
+                <label className="text-sm flex-1 text-left">
+                  <span className="block mb-1 font-medium" style={{ color: INK }}>Pickup</span>
+                  <div className="flex items-center gap-2 px-3 py-2" style={{ border: `1px solid ${LINE}`, borderRadius: 3, backgroundColor: "white" }}>
+                    <Calendar size={14} style={{ opacity: 0.5 }} />
+                    <input type="date" value={search.pickup} min={todayISO()}
+                      onChange={(e) => setSearch({ ...search, pickup: e.target.value })}
+                      className="w-full text-sm outline-none" style={{ backgroundColor: "transparent" }} />
+                  </div>
+                </label>
+                <label className="text-sm flex-1 text-left">
+                  <span className="block mb-1 font-medium" style={{ color: INK }}>Return</span>
+                  <div className="flex items-center gap-2 px-3 py-2" style={{ border: `1px solid ${LINE}`, borderRadius: 3, backgroundColor: "white" }}>
+                    <Calendar size={14} style={{ opacity: 0.5 }} />
+                    <input type="date" value={search.ret} min={search.pickup}
+                      onChange={(e) => setSearch({ ...search, ret: e.target.value })}
+                      className="w-full text-sm outline-none" style={{ backgroundColor: "transparent" }} />
+                  </div>
+                </label>
+                <button
+                  onClick={() => document.getElementById("vehicle-list")?.scrollIntoView({ behavior: "smooth" })}
+                  className="px-6 py-2 text-sm font-semibold self-end"
+                  style={{ backgroundColor: RED, color: CARD, borderRadius: 3, height: 42 }}
+                >
+                  Search
+                </button>
+              </div>
 
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <div className="flex items-center justify-center gap-8 mt-8 flex-wrap">
+                {[
+                  "No hidden fees",
+                  "Pay deposit via M-Pesa",
+                  "Book directly with owners",
+                  "Narok Town & the Mara",
+                ].map((item) => (
+                  <span key={item} className="text-sm" style={{ color: INK, opacity: 0.6 }}>{item}</span>
+                ))}
+              </div>
+            </section>
+            <div id="vehicle-list" className="flex items-center gap-2 mb-2 flex-wrap">
               {TYPES.map((t) => (
                 <button key={t} onClick={() => setActiveType(t)} className="text-sm px-3 py-1.5 font-medium"
                   style={{ borderRadius: 3, border: `1px solid ${activeType === t ? INK : LINE}`, backgroundColor: activeType === t ? INK : "transparent", color: activeType === t ? CARD : INK }}>
