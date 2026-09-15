@@ -1,7 +1,23 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
-  Car, MapPin, Calendar, Phone, User, CheckCircle2, ArrowLeft,
-  Users, Fuel, Gauge, Loader2, Check
+  Car,
+  MapPin,
+  Calendar,
+  Phone,
+  User,
+  CheckCircle2,
+  ArrowLeft,
+  Users,
+  Fuel,
+  Gauge,
+  Loader2,
+  Check,
+  Facebook,
+  Instagram,
+  Linkedin,
+  MessageCircle,
+  Mail,
+  Clock3
 } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
@@ -1226,59 +1242,439 @@ export default function App() {
         )}
       </main>
 
-      <footer
-        className="px-6 py-10 mt-12"
-        style={{ backgroundColor: INK, borderTop: `3px solid ${BLUE}` }}
-      >
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-            <div className="flex items-center gap-4">
-              <div
-                className="flex items-center justify-center overflow-hidden shrink-0"
-                style={{
-                  width: 86,
-                  height: 58,
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: 8,
-                  padding: 4,
-                }}
-              >
-                <img
-                  src={LOGO_SRC}
-                  alt="KOLDrive Instant logo"
-                  className="w-full h-full object-contain"
-                />
-              </div>
+     <footer
+  className="mt-16"
+  style={{
+    background:
+      "linear-gradient(180deg, #101010 0%, #080808 100%)",
+    color: "#FFFFFF",
+    borderTop: `3px solid ${BLUE}`,
+  }}
+>
+  <div className="max-w-7xl mx-auto px-6 py-14">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
 
-              <div>
-                <p className="font-semibold text-lg" style={{ color: "#FFFFFF" }}>KOLDrive</p>
-                <p className="text-[10px] tracking-[0.32em] font-semibold mb-1" style={{ color: "#4DA3FF" }}>INSTANT</p>
-                <p className="text-sm" style={{ color: CARD, opacity: 0.6 }}>
-                  Narok Town &amp; the Maasai Mara
-                </p>
-              </div>
+      {/* =====================================================
+          COLUMN 1 - BRAND
+      ====================================================== */}
+      <div>
+        {/* Logo */}
+        <div
+          className="flex items-center justify-center mb-6"
+          style={{
+            width: 170,
+            height: 82,
+            backgroundColor: "#FFFFFF",
+            borderRadius: 8,
+            padding: 8,
+          }}
+        >
+          <img
+            src="/koldrive-logo.png"
+            alt="KOLDrive INSTANT"
+            className="max-w-full max-h-full object-contain"
+          />
+        </div>
+
+        <h3
+          className="text-lg font-semibold mb-3"
+          style={{ color: "#2997FF" }}
+        >
+          Premium Mobility Solutions
+        </h3>
+
+        <p
+          className="text-sm leading-7"
+          style={{
+            color: "#B8C4D8",
+            maxWidth: 420,
+          }}
+        >
+          Reliable car hire and mobility solutions in Narok and
+          the Maasai Mara. Choose your vehicle, make a booking,
+          and connect directly with the vehicle owner.
+        </p>
+
+        {/* Social media */}
+        <div className="flex items-center gap-4 mt-7">
+
+          <a
+            href="#"
+            aria-label="Facebook"
+            className="flex items-center justify-center transition-all duration-200 hover:scale-110"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              backgroundColor: "#171717",
+              color: "#FFFFFF",
+            }}
+          >
+            <Facebook size={20} />
+          </a>
+
+          <a
+            href="#"
+            aria-label="Instagram"
+            className="flex items-center justify-center transition-all duration-200 hover:scale-110"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              backgroundColor: "#171717",
+              color: "#FFFFFF",
+            }}
+          >
+            <Instagram size={20} />
+          </a>
+
+          <a
+            href="#"
+            aria-label="LinkedIn"
+            className="flex items-center justify-center transition-all duration-200 hover:scale-110"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              backgroundColor: "#171717",
+              color: "#FFFFFF",
+            }}
+          >
+            <Linkedin size={20} />
+          </a>
+
+          <a
+            href="https://wa.me/254701390914?text=Hello%20KOLDrive%20INSTANT%2C%20I%20would%20like%20to%20ask%20about%20a%20vehicle."
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp"
+            className="flex items-center justify-center transition-all duration-200 hover:scale-110"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              backgroundColor: "#171717",
+              color: "#FFFFFF",
+            }}
+          >
+            <MessageCircle size={20} />
+          </a>
+
+        </div>
+      </div>
+
+      {/* =====================================================
+          COLUMN 2 - QUICK LINKS
+      ====================================================== */}
+      <div>
+        <h3
+          className="text-xl font-semibold mb-8"
+          style={{ color: "#FFFFFF" }}
+        >
+          Quick Links
+        </h3>
+
+        <div className="flex flex-col gap-5">
+
+          <button
+            onClick={() => {
+              setTab("book");
+              setView("browse");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="text-left text-sm transition-colors duration-200"
+            style={{ color: "#AEB9CB" }}
+          >
+            Book a car
+          </button>
+
+          <button
+            onClick={() => {
+              setTab("list");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="text-left text-sm transition-colors duration-200"
+            style={{ color: "#AEB9CB" }}
+          >
+            List your vehicle
+          </button>
+
+          <button
+            onClick={() => {
+              setTab("book");
+              setView("browse");
+              document
+                .getElementById("vehicle-list")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="text-left text-sm transition-colors duration-200"
+            style={{ color: "#AEB9CB" }}
+          >
+            Our fleet
+          </button>
+
+          <a
+            href="mailto:info@koldrive.co.ke"
+            className="text-sm"
+            style={{ color: "#AEB9CB" }}
+          >
+            Contact us
+          </a>
+
+        </div>
+      </div>
+
+      {/* =====================================================
+          COLUMN 3 - CONTACT 0701390914
+      ====================================================== */}
+      <div>
+        <h3
+          className="text-xl font-semibold mb-8"
+          style={{ color: "#FFFFFF" }}
+        >
+          Contact
+        </h3>
+
+        <div className="space-y-7">
+
+          <div>
+            <div
+              className="flex items-center gap-2 font-medium mb-2"
+              style={{ color: "#FFFFFF" }}
+            >
+              <MapPin size={18} color="#2997FF" />
+              Location
             </div>
 
-            <a
-              href="https://wa.me/254701390914?text=Hi%2C%20I%27d%20like%20to%20ask%20about%20a%20vehicle%20in%20Narok."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold self-start lg:self-auto"
-              style={{ backgroundColor: BLUE, color: "#FFFFFF", borderRadius: 6 }}
+            <p
+              className="text-sm leading-6"
+              style={{ color: "#AEB9CB" }}
             >
-              <Phone size={16} />
-              Chat with us on WhatsApp
-            </a>
+              Narok Town
+              <br />
+              Narok County, Kenya
+              <br />
+              Near the Maasai Mara
+            </p>
           </div>
 
+          <div>
+            <div
+              className="flex items-center gap-2 font-medium mb-2"
+              style={{ color: "#FFFFFF" }}
+            >
+              <Mail size={18} color="#2997FF" />
+              Email
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <a
+                href="mailto:info@koldrive.co.ke"
+                className="text-sm"
+                style={{ color: "#AEB9CB" }}
+              >
+                info@koldrive.co.ke
+              </a>
+
+              <a
+                href="mailto:bookings@koldrive.co.ke"
+                className="text-sm"
+                style={{ color: "#AEB9CB" }}
+              >
+                bookings@koldrive.co.ke
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <div
+              className="flex items-center gap-2 font-medium mb-2"
+              style={{ color: "#FFFFFF" }}
+            >
+              <Phone size={18} color="#2997FF" />
+              Phone
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <a
+                href="tel:+254701390914"
+                className="text-sm"
+                style={{ color: "#AEB9CB" }}
+              >
+                +254 701 390 914
+              </a>
+
+              <a
+                href="tel:+254700000000"
+                className="text-sm"
+                style={{ color: "#AEB9CB" }}
+              >
+                +254 700 000 000
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* =====================================================
+          COLUMN 4 - WORKING HOURS
+      ====================================================== */}
+      <div>
+        <h3
+          className="text-xl font-semibold mb-8"
+          style={{ color: "#FFFFFF" }}
+        >
+          Working Hours
+        </h3>
+
+        <div className="space-y-5">
+
+          <div className="flex gap-3">
+            <Clock3
+              size={20}
+              color="#2997FF"
+              className="shrink-0 mt-1"
+            />
+
+            <div>
+              <p
+                className="text-sm mb-1"
+                style={{ color: "#FFFFFF" }}
+              >
+                Monday – Friday
+              </p>
+
+              <p
+                className="text-sm"
+                style={{ color: "#AEB9CB" }}
+              >
+                08:00 AM – 09:00 PM
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <Clock3
+              size={20}
+              color="#2997FF"
+              className="shrink-0 mt-1"
+            />
+
+            <div>
+              <p
+                className="text-sm mb-1"
+                style={{ color: "#FFFFFF" }}
+              >
+                Saturday
+              </p>
+
+              <p
+                className="text-sm"
+                style={{ color: "#AEB9CB" }}
+              >
+                09:00 AM – 07:00 PM
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <Clock3
+              size={20}
+              color="#2997FF"
+              className="shrink-0 mt-1"
+            />
+
+            <div>
+              <p
+                className="text-sm mb-1"
+                style={{ color: "#FFFFFF" }}
+              >
+                Sunday
+              </p>
+
+              <p
+                className="text-sm"
+                style={{ color: "#AEB9CB" }}
+              >
+                Closed
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Availability box */}
+        <div
+          className="mt-8 p-5"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(41,151,255,0.14), rgba(41,151,255,0.04))",
+            border: "1px solid rgba(41,151,255,0.35)",
+            borderRadius: 10,
+          }}
+        >
           <p
-            className="max-w-4xl mx-auto mt-8 pt-6 text-xs"
-            style={{ color: CARD, opacity: 0.4, borderTop: "1px solid rgba(255,255,255,0.1)" }}
+            className="font-semibold text-sm leading-6"
+            style={{ color: "#2997FF" }}
           >
-            &copy; {new Date().getFullYear()} KOLDrive Instant. Bookings are confirmed directly with vehicle owners.
+            24/7 WhatsApp support
+            <br />
+            Available for bookings
           </p>
         </div>
-      </footer>
-        </div>
+
+      </div>
+    </div>
+
+    {/* =====================================================
+        BOTTOM BAR
+    ====================================================== */}
+    <div
+      className="mt-14 pt-7 flex flex-col md:flex-row items-center justify-between gap-4"
+      style={{
+        borderTop: "1px solid rgba(255,255,255,0.10)",
+      }}
+    >
+      <p
+        className="text-xs text-center md:text-left"
+        style={{ color: "#718096" }}
+      >
+        © {new Date().getFullYear()} KOLDrive INSTANT. All rights reserved.
+      </p>
+
+      <p
+        className="text-xs text-center md:text-right"
+        style={{ color: "#718096" }}
+      >
+        Direct vehicle bookings • Narok & Maasai Mara
+      </p>
+    </div>
+  </div>
+
+  {/* =====================================================
+      FLOATING WHATSAPP BUTTON
+  ====================================================== */}
+  <a
+    href="https://wa.me/254701390914?text=Hello%20KOLDrive%20INSTANT%2C%20I%20would%20like%20to%20book%20a%20vehicle."
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Chat with KOLDrive on WhatsApp"
+    className="fixed flex items-center justify-center shadow-xl transition-transform duration-200 hover:scale-110"
+    style={{
+      right: 28,
+      bottom: 28,
+      width: 64,
+      height: 64,
+      borderRadius: "50%",
+      backgroundColor: "#25D366",
+      color: "#FFFFFF",
+      zIndex: 50,
+    }}
+  >
+    <MessageCircle size={34} strokeWidth={2.2} />
+  </a>
+</footer>
+    </div>
   );
 }
