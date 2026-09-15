@@ -8,13 +8,16 @@ const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
 
 // ---- Design tokens ----
 const INK = "#201D18";
-const SAND = "#FFFFF";
+const SAND = "#FFFFFF";
 const CARD = "#FBF8F1";
 const RED = "#A8382B";
 const OLIVE = "#556047";
 const GOLD = "#C0923A";
 const TEAL = "#3D6763";
 const LINE = "rgba(32,29,24,0.12)";
+const BLUE = "#1F4E8C";
+const LOGO_SRC = "/koldrive-logo.png";
+const LOGO_MARK_SRC = "/koldrive-logo-mark.png";
 
 const TYPE_COLOR = {
   "Safari 4x4": RED,
@@ -1093,10 +1096,22 @@ export default function App() {
 
   return (
     <div style={{ backgroundColor: SAND, minHeight: "100vh" }} className="w-full font-sans">
-      <header className="flex items-center justify-between px-6 py-4" style={{ backgroundColor: INK }}>
-        <div className="flex items-center gap-2">
-          <Car size={20} color={GOLD} />
-          <span className="font-serif text-lg" style={{ color: CARD }}>Narok Car Hire</span>
+      <header className="flex items-center justify-between px-4 sm:px-6 py-3" style={{ backgroundColor: INK }}>
+        <div className="flex items-center gap-3 min-w-0">
+          <div
+            className="flex items-center justify-center overflow-hidden shrink-0"
+            style={{ width: 48, height: 48, backgroundColor: "#FFFFFF", borderRadius: 8, padding: 3 }}
+          >
+            <img
+              src={LOGO_MARK_SRC}
+              alt="KD — KOLDrive Instant"
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <div className="min-w-0">
+            <div className="font-semibold text-lg leading-tight" style={{ color: "#FFFFFF" }}>KOLDrive</div>
+            <div className="text-[10px] sm:text-xs tracking-[0.28em] font-semibold leading-tight" style={{ color: "#4DA3FF" }}>INSTANT</div>
+          </div>
         </div>
         <nav className="flex items-center gap-6">
           <button onClick={() => { setTab("book"); setView("browse"); }} className="text-sm font-medium pb-1"
@@ -1206,10 +1221,64 @@ export default function App() {
           <Confirmation booking={booking} onDone={() => { setView("browse"); setSelected(null); setBooking(null); }} />
         )}
 
-        {tab === "list" && (
+                {tab === "list" && (
           <ListVehicleForm onAdded={(veh) => setVehicles((prev) => [veh, ...prev])} />
         )}
       </main>
-    </div>
+
+      <footer
+        className="px-6 py-10 mt-12"
+        style={{ backgroundColor: INK, borderTop: `3px solid ${BLUE}` }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+            <div className="flex items-center gap-4">
+              <div
+                className="flex items-center justify-center overflow-hidden shrink-0"
+                style={{
+                  width: 86,
+                  height: 58,
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: 8,
+                  padding: 4,
+                }}
+              >
+                <img
+                  src={LOGO_SRC}
+                  alt="KOLDrive Instant logo"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              <div>
+                <p className="font-semibold text-lg" style={{ color: "#FFFFFF" }}>KOLDrive</p>
+                <p className="text-[10px] tracking-[0.32em] font-semibold mb-1" style={{ color: "#4DA3FF" }}>INSTANT</p>
+                <p className="text-sm" style={{ color: CARD, opacity: 0.6 }}>
+                  Narok Town &amp; the Maasai Mara
+                </p>
+              </div>
+            </div>
+
+            <a
+              href="https://wa.me/254701390914?text=Hi%2C%20I%27d%20like%20to%20ask%20about%20a%20vehicle%20in%20Narok."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold self-start lg:self-auto"
+              style={{ backgroundColor: BLUE, color: "#FFFFFF", borderRadius: 6 }}
+            >
+              <Phone size={16} />
+              Chat with us on WhatsApp
+            </a>
+          </div>
+
+          <p
+            className="max-w-4xl mx-auto mt-8 pt-6 text-xs"
+            style={{ color: CARD, opacity: 0.4, borderTop: "1px solid rgba(255,255,255,0.1)" }}
+          >
+            &copy; {new Date().getFullYear()} KOLDrive Instant. Bookings are confirmed directly with vehicle owners.
+          </p>
+        </div>
+      </footer>
+        </div>
   );
 }
